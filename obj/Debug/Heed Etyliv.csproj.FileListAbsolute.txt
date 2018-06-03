@@ -1,0 +1,9 @@
+c:\users\yinyin\documents\visual studio 2012\Projects\Heed Etyliv\Heed Etyliv\bin\Debug\Heed Etyliv.exe.config
+c:\users\yinyin\documents\visual studio 2012\Projects\Heed Etyliv\Heed Etyliv\bin\Debug\Heed Etyliv.exe
+c:\users\yinyin\documents\visual studio 2012\Projects\Heed Etyliv\Heed Etyliv\bin\Debug\Heed Etyliv.pdb
+c:\users\yinyin\documents\visual studio 2012\Projects\Heed Etyliv\Heed Etyliv\obj\Debug\Heed Etyliv.csprojResolveAssemblyReference.cache
+c:\users\yinyin\documents\visual studio 2012\Projects\Heed Etyliv\Heed Etyliv\obj\Debug\Heed Etyliv.exe
+c:\users\yinyin\documents\visual studio 2012\Projects\Heed Etyliv\Heed Etyliv\obj\Debug\Heed Etyliv.pdb
+C:\Users\YinYin\AppData\Roaming\Seek Etyliv\Heed Etyliv.exe.config
+C:\Users\YinYin\AppData\Roaming\Seek Etyliv\Heed Etyliv.exe
+C:\Users\YinYin\AppData\Roaming\Seek Etyliv\Heed Etyliv.pdb
