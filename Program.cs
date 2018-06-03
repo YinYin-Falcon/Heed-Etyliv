@@ -23,14 +23,14 @@ namespace Heed_Etyliv
             fileSystemWatcher.Path = AppDomain.CurrentDomain.BaseDirectory; 
             fileSystemWatcher.EnableRaisingEvents = true;
 
-            // setup portraits list
+            // initialise portraits list
             portraits = new List<Portrait>();
             foreach (Id i in Enum.GetValues(typeof(Id)))
                 portraits.Add(new Portrait(i));
 
-            // setup tracker
+            // initialise tracker array
             tracker = new int[6];
-
+            
             // print rules
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Green;
@@ -50,6 +50,11 @@ namespace Heed_Etyliv
             Console.Write("King");
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine(" has been played");
+            Console.WriteLine();
+            Console.WriteLine(" this tracker is available at:");
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(" " + "https://github.com/YinYin-Falcon/Heed-Etyliv");
 
             Console.ReadLine();
         }
