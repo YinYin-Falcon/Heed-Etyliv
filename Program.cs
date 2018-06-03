@@ -180,12 +180,13 @@ namespace Heed_Etyliv
             string l19 = read.Substring(from, to - from);
             l19 = Regex.Replace(l19, @"[ ]|[\[]|[\]]", "");
             split = l19.Split(',');
-            for (int i = 0; i < split.Length; i++)
-            {
-                int c;
-                if (Int32.TryParse(split[i], out c))
-                    tracker[i] = c;
-            }
+            if (split.Length == tracker.Length)
+                for (int i = 0; i < split.Length; i++)
+                {
+                    int c;
+                    if (Int32.TryParse(split[i], out c))
+                        tracker[i] = c;
+                }
         }
 
         private static void PrintStatus()
