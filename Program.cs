@@ -12,9 +12,11 @@ namespace Heed_Etyliv
     {
         public static FileSystemWatcher fileSystemWatcher;
         public static List<Portrait> portraits;
+        public static List<Split> splits;
         public static int[] tracker;
-        public static DateTime t;
-        public static DateTime f;
+        public static DateTime timestart = DateTime.MinValue;
+        public static DateTime ftimer;
+        private static bool update = false;
 
         static void Main(string[] args)
         {
@@ -27,6 +29,13 @@ namespace Heed_Etyliv
             portraits = new List<Portrait>();
             foreach (Id i in Enum.GetValues(typeof(Id)))
                 portraits.Add(new Portrait(i));
+
+            // initialise splits list
+            splits = new List<Split>();
+            splits.Add(new Split("STORY 1"));
+            splits.Add(new Split("STORY 2"));
+            foreach (Id i in Enum.GetValues(typeof(Id)))
+                splits.Add(new Split(Enum.GetName(typeof(Id), i)));
 
             // initialise tracker array
             tracker = new int[6];
@@ -56,14 +65,27 @@ namespace Heed_Etyliv
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(" " + "https://github.com/YinYin-Falcon/Heed-Etyliv");
 
-            Console.ReadLine();
+            //write loop
+            while (true)
+            {
+                if (update)
+                {
+                    PrintStatus();
+                    update = false;
+                }
+                else if (timestart != DateTime.MinValue && splits.Find(p => p.name == "King").time == DateTime.MinValue)
+                {
+                    Console.SetCursorPosition(0, 0);
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.Write(new DateTime((DateTime.Now - timestart).Ticks).ToString("mm:ss.fff"));
+                }
+            }
         }
  
         private static void FileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            Console.Clear();
             UpdateStatus(Path.Combine(fileSystemWatcher.Path, e.Name));
-            PrintStatus();
+            update = true;     
         }
 
         private static string Read(string FileName)
@@ -122,6 +144,10 @@ namespace Heed_Etyliv
             if (read == null)
                 return;
 
+            // split out mode progress
+            if (read.Contains("0: 3,\n") && splits.Find(p => p.name == "STORY 1").time == DateTime.MinValue)
+                splits.Find(p => p.name == "STORY 1").time = new DateTime((DateTime.Now - timestart).Ticks);
+
             // split out portrait progress
             int from = read.IndexOf("16: [") + "16: [".Length;
             int to = read.IndexOf("],\n", from);
@@ -133,6 +159,7 @@ namespace Heed_Etyliv
             if (split.Length != 60)
                 return;
             Portrait currentportrait = (Portrait)portraits.Find(p => p.id == Id.Prisoner);
+            Split currenttimesplit = null;
             int r = 0;
             for (int i = 0; i < split.Length; i++)
                 switch (r)
@@ -141,7 +168,10 @@ namespace Heed_Etyliv
                         r = 1;
                         int c;
                         if (Int32.TryParse(split[i], out c))
+                        {
                             currentportrait = (Portrait)portraits.Find(p => p.id == (Id)c);
+                            currenttimesplit = (Split)splits.Find(p => p.name == Enum.GetName(typeof(Id), c));
+                        }
                         break;
                     case 1:
                         r = 2;
@@ -151,9 +181,11 @@ namespace Heed_Etyliv
                             currentportrait.unlocked = false;
                         else
                         {
+                            if (currentportrait.name == "Bird" && currenttimesplit.time == DateTime.MinValue)
+                                splits.Find(p => p.name == "STORY 2").time = new DateTime((DateTime.Now - timestart).Ticks);
+                            else if (currentportrait.name == "Prisoner" && !currentportrait.unlocked)
+                                timestart = DateTime.Now;
                             currentportrait.unlocked = true;
-                            if (currentportrait.name == "Prisoner" && t.Year == 1)
-                                t = DateTime.Now;
                         }
                         break;
                     case 2:
@@ -164,15 +196,16 @@ namespace Heed_Etyliv
                             currentportrait.played = false;
                         else
                         {
+                            currenttimesplit.time = new DateTime((DateTime.Now - timestart).Ticks);
                             portraits.Remove(currentportrait);
                             //currentportrait.played = true;
-                            if (portraits.Count == 0 && f.Year == 1)
-                                f = DateTime.Now;
+                            if (portraits.Count == 0 && ftimer.Year == 1)
+                                ftimer = DateTime.Now;
                         }
                         break;
                 }
 
-            // split out individual portrait progress
+            /*/ split out individual portrait progress
             from = read.IndexOf("19: [") + "19: [".Length;
             to = read.IndexOf("],\n", from);
             if (to - from < 0)
@@ -186,33 +219,21 @@ namespace Heed_Etyliv
                     int c;
                     if (Int32.TryParse(split[i], out c))
                         tracker[i] = c;
-                }
+                }*/
         }
 
         private static void PrintStatus()
         {
-            // print current or final time
-            if (portraits.Count > 0)
+            // sort splits
+            splits.Sort(delegate(Split a, Split b)
             {
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine(DateTime.Now - t);
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(f - t);
-            }
-
-            // sort portraits
-            portraits.Sort(delegate(Portrait a, Portrait b)
-            {
-                int xdiff = b.unlocked.CompareTo(a.unlocked);
+                int xdiff = b.time.CompareTo(a.time);
                 if (xdiff != 0) return xdiff;
                 else return a.name.CompareTo(b.name);
             });
 
             // print progress
-            for (int i = 0; i < portraits.Count; i++)
+            /*for (int i = 0; i < portraits.Count; i++)
             {
                 if (portraits[i].unlocked)
                     Console.ForegroundColor = ConsoleColor.Green;
@@ -245,7 +266,28 @@ namespace Heed_Etyliv
                     }
                     Console.WriteLine();
                 }
+            }*/
+
+            Console.Clear();
+
+            if (splits.Find(p => p.name == "King").time == DateTime.MinValue)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine(new DateTime((DateTime.Now - timestart).Ticks).ToString("mm:ss.fff"));
             }
+            for (int i = 0; i < splits.Count; i++)
+            {
+                if (i == 0 && splits[i].time != DateTime.MinValue)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(splits[i].time.ToString("mm:ss.fff "));
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.WriteLine(splits[i].name);
+                }
+                else if (splits[i].time != DateTime.MinValue)
+                    Console.WriteLine(splits[i].time.ToString("mm:ss.fff ") + splits[i].name);
+            }
+
         }
 
         [System.Serializable]
@@ -262,6 +304,19 @@ namespace Heed_Etyliv
                 unlocked = false;
                 played = false;
                 id = i;
+            }
+        }
+
+        [System.Serializable]
+        public class Split
+        {
+            public string name;
+            public DateTime time;
+
+            public Split(string n)
+            {
+                name = n;
+                time = DateTime.MinValue;
             }
         }
 
