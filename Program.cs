@@ -181,7 +181,7 @@ namespace Heed_Etyliv
                             currentportrait.unlocked = false;
                         else
                         {
-                            if (currentportrait.name == "Bird" && currenttimesplit.time == DateTime.MinValue)
+                            if (currentportrait.name == "Bird" && !currentportrait.unlocked)
                                 splits.Find(p => p.name == "STORY 2").time = new DateTime((DateTime.Now - timestart).Ticks);
                             else if (currentportrait.name == "Prisoner" && !currentportrait.unlocked)
                                 timestart = DateTime.Now;
